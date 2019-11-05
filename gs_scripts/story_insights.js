@@ -1,7 +1,7 @@
-var user_access_token = "access_token=";
+var user_access_token = "";
 var page_id = "";
 var insta_id = "";
-var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("story_insights");
+var story_insights_sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("story_insights");
 
 function getStoryInsights() {
 
@@ -24,16 +24,17 @@ function getStoryInsights() {
   var id_arr = id_arr_raw.reverse();
   Logger.log(id_arr);
   //For each id in arr  
-    id_arr.forEach(function(obj_id) {
+  id_arr.forEach(function(obj_id) {
     // Call API to get timestamp
     var timestamp_request = "https://graph.facebook.com/v4.0/" + obj_id + "?fields=timestamp&" + user_access_token;
     var timestamp = JSON.parse(UrlFetchApp.fetch(timestamp_request))['timestamp'];
-    //2d matrix to map onto the spreadsheet
+    //2D matrix to map onto the spreadsheet
     var values = [obj_id, timestamp];
     var story_metrics = "exits,impressions,reach,replies,taps_forward,taps_back";
     // Call API to get insight metrics
     var story_metric_request = "https://graph.facebook.com/v4.0/" + obj_id + "/insights?metric=" + story_metrics + "&" + user_access_token;
     var results = JSON.parse(UrlFetchApp.fetch(story_metric_request).getContentText());
+    Logger.log(results);
     //Record insight values
     for (i = 0; i <6; i++) {
          values.push(results['data'][i]['values'][0]['value']);
@@ -41,7 +42,7 @@ function getStoryInsights() {
     //2d array
     var values_arr = [values];
      //Write values to sheet
-    sheet.getRange(sheet.getLastRow()+1, 1, values_arr.length, values_arr[0].length).setValues(values_arr);
+    story_insights_sheet.getRange(story_insights_sheet.getLastRow()+1, 1, values_arr.length, values_arr[0].length).setValues(values_arr);
     
   });
 }

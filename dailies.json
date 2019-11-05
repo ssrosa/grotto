@@ -29220,8 +29220,6 @@
             }
         ],
         "paging": {
-            "next": "https://graph.facebook.com/v4.0/17841401233892528/insights?access_token=EAAK3TPwJpZAsBAPfnt6imasSpkOOnywC2UIrzcnZBeyD5QuRJACjYo9fJgt62RunFGtfdJvtlYZCfZCn1ULcZBeHgaPyPzQmtP72AAbdKcqHMLdBTdzZCagBDAnHp2akMJ7Q95fFzPGyZBU3gb1r5ZA8d4ESLy6Ukjj5ApZCE0eReNQZDZD&since=1510444801&until=1513036801&metric=email_contacts%2Cfollower_count%2Cget_directions_clicks%2Cimpressions%2Cphone_call_clicks%2Cprofile_views%2Creach%2Ctext_message_clicks%2Cwebsite_clicks&period=day",
-            "previous": "https://graph.facebook.com/v4.0/17841401233892528/insights?access_token=EAAK3TPwJpZAsBAPfnt6imasSpkOOnywC2UIrzcnZBeyD5QuRJACjYo9fJgt62RunFGtfdJvtlYZCfZCn1ULcZBeHgaPyPzQmtP72AAbdKcqHMLdBTdzZCagBDAnHp2akMJ7Q95fFzPGyZBU3gb1r5ZA8d4ESLy6Ukjj5ApZCE0eReNQZDZD&since=1505260799&until=1507852799&metric=email_contacts%2Cfollower_count%2Cget_directions_clicks%2Cimpressions%2Cphone_call_clicks%2Cprofile_views%2Creach%2Ctext_message_clicks%2Cwebsite_clicks&period=day"
-        }
+             }
     }
 ]
