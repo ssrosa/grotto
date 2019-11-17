@@ -24,6 +24,11 @@ function getMediaObjectData() {
   //Reverse ids so they'll be chronological
   var id_arr = id_arr_raw.reverse();
   Logger.log(id_arr);
+  
+  // How to compare ids from this call to those already in the spreadsheet?
+  //
+  
+  //New loop runs on array of chron. ids
   //For each id in arr  
   id_arr.forEach(function(obj_id) {
     //Call API again to get the rest of the values 
@@ -35,15 +40,37 @@ function getMediaObjectData() {
     // Parse the JSON reply
     var json = response.getContentText();
     var data = JSON.parse(json);
-    var values = [];
     //Capture each piece of data from the json file
-    values.push([obj_id, data['timestamp'], data['caption'], data['comments'], data['comments_count'], data['media_type'], data['media_url'], data['like_count']]);
+    var values = [obj_id, data['timestamp'], data['caption'], 
+                 data['comments'], data['comments_count'], 
+                 data['media_type'], data['media_url'], 
+                 data['like_count']];
     Logger.log(values);
+    
+    //Get insight metrics -- these vary by media object.
+    if (data['media_type'] == 'IMAGE' ) {
+      var metrics = "engagement,impressions,reach,saved,"
+    }   
+    else if (data['media_type'] == 'VIDEO') {
+      //video_views throws an error if used on an image
+      var metrics = "engagement,impressions,reach,saved,video_views"
+    }
+    else if (data['media_type'] == 'CAROUSEL_ALBUM') {
+      //video_views will apparently just return 0 on this one if it's not a vid
+      var metrics = "carousel_album_engagement,carousel_album_impressions,carousel_album_reach,carousel_album_saved,carousel_album_video_views";
+    }
+    //Array to hold insight metrics (4 or 5 values)
+    var insights = [];
+    var insights_request = "https://graph.facebook.com/v4.0/" + obj_id + "/insights?metric=" + metrics + "&" + user_access_token;
+    //Call API
+    var results = JSON.parse(UrlFetchApp.fetch(insights_request).getContentText());
+    //Append the insight value sto the array. (4 or 5 more values)
+    results['data'].forEach(function(metric) {
+      values.push(metric['values'][0]['value'])
+    });
+    //2d array of values
+    var values_arr = [values];
     //Write values to sheet
-   // story_insights_sheet.getRange(story_insights_sheet.getLastRow()+1, 1, values_arr.length, values_arr[0].length).setValues(values_arr);
-
-    media_objects_sheet.getRange(media_objects_sheet.getLastRow()+1, 1, values.length, values[0].length).setValues(values);
-  });
-
+    media_objects_sheet.getRange(media_objects_sheet.getLastRow()+1, 1, values_arr.length, values_arr[0].length).setValues(values_arr);
+  });  
 }
-
