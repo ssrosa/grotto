@@ -13,3 +13,5 @@ Issues:
 - media_object script still replicates some posts. Need an algorithm to read ids on spreadsheet to compare to ids pulled from API before calling for insights on each id.
 
 - media_objects script has stopped successfully pulling and storing comments.  Now just pulls a dictionary with only gibberish.
+
+update 12/2: figured out comment bug, now need to get back comments for october. See tests.gs for list of ids
