@@ -10,8 +10,10 @@ Back data on followers is apparently not available.
 
 Issues:
 
-- media_object script still replicates some posts. Need an algorithm to read ids on spreadsheet to compare to ids pulled from API before calling for insights on each id.
+- media_object script still replicates some posts. Need an algorithm to read ids on spreadsheet to compare to ids pulled from API before calling for insights on each id. FIXED
 
-- media_objects script has stopped successfully pulling and storing comments.  Now just pulls a dictionary with only gibberish.
+- media_objects script has stopped successfully pulling and storing comments.  Now just pulls a dictionary with only gibberish. FIXED
 
 update 12/2: figured out comment bug, now need to get back comments for october. See tests.gs for list of ids
+
+update 12/15: wrote new logic to check for duplicate rows after 15 most recent media object ids are returned from first api call.
