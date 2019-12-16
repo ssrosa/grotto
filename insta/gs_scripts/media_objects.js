@@ -2,17 +2,22 @@ var user_access_token = "";
 var page_id = "";
 var insta_id = "";
 var media_objects_sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("media_objects");
+var pull_range = 15; // NUmber of media objects to be pulled
 
+/*
+This function gets the 15 most recent media objects. If any of the IDs in these 15 match IDs that
+are already in the table, those rows get deleted and replaced by these. There is no option to define
+the range of IDs returned in the query by date; if there were, we could simply pull a week's worth.
+This method of replacing duplicates is the workaround for that.
+*/
 
 function getMediaObjectData() {
-  //LATER: define the range of objects to return. One day's worth?
-  var media_object_ids = "https://graph.facebook.com/v4.0/" + insta_id + "/media?" + user_access_token + "&limit=10";
+
+  var media_object_ids = "https://graph.facebook.com/v4.0/" + insta_id + "/media?" + user_access_token + "&limit=" + pull_range;
   var response = UrlFetchApp.fetch(media_object_ids);
-  Logger.log(response.getContentText());
   
   // Parse the JSON reply
-  var json = response.getContentText();
-  var data = JSON.parse(json);
+  var data = JSON.parse(response.getContentText());
 
   var id_arr_raw = [];
   //For each media object:
@@ -20,33 +25,39 @@ function getMediaObjectData() {
     //Get id of each object
     id_arr_raw.push(object['id']);
   });
-  Logger.log(id_arr_raw);
+  //Logger.log(id_arr_raw);
   //Reverse ids so they'll be chronological
   var id_arr = id_arr_raw.reverse();
   Logger.log(id_arr);
+
+  //Delete rows that will be duplicated:
+  // Compare the id of the last row to the id_arr and delete the row
+  // if the id is found. Continue until id is not found.
+  var id_found = true; 
+  while (id_found == true) {
+    var id_to_compare = (media_objects_sheet.getRange(media_objects_sheet.getLastRow(), 1).getValue());
+    if (id_arr.indexOf(id_to_compare) != -1) {
+      media_objects_sheet.deleteRow(media_objects_sheet.getLastRow());
+    } else {
+      id_found = false;
+    }
+  }
   
-  // How to compare ids from this call to those already in the spreadsheet?
-  //
-  
-  //New loop runs on array of chron. ids
-  //For each id in arr  
   id_arr.forEach(function(obj_id) {
     //Call API again to get the rest of the values 
     var media_object = "https://graph.facebook.com/v4.0/" + 
       obj_id + "?fields=caption,comments,comments_count,media_type,media_url,like_count,timestamp&" + user_access_token;
     //Call API
     var response = UrlFetchApp.fetch(media_object);
-    Logger.log(response.getContentText());
     // Parse the JSON reply
-    var json = response.getContentText();
-    var data = JSON.parse(json);
+    var data = JSON.parse(response.getContentText());
     //Capture each piece of data from the json file
-    var values = [obj_id, data['timestamp'], data['caption'], 
-                 data['comments'], data['comments_count'], 
+    //data['comments'] can't be read unless it is stringified first.
+     var values = [obj_id, data['timestamp'], data['caption'], 
+                 JSON.stringify(data['comments']), data['comments_count'], 
                  data['media_type'], data['media_url'], 
                  data['like_count']];
-    Logger.log(values);
-    
+
     //Get insight metrics -- these vary by media object.
     if (data['media_type'] == 'IMAGE' ) {
       var metrics = "engagement,impressions,reach,saved,"
